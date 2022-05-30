@@ -1,4 +1,7 @@
 from tinydb import TinyDB
+from operator import itemgetter
+from operator import attrgetter
+
 """definition des classes Tour et Match et de leurs methodes"""
 
 class Tour:
@@ -22,26 +25,6 @@ class Tour:
         end_time = serialized_tour["date_et_heure_de_fin_de_partie"]
         round_instances_list = serialized_tour["liste_des_instances_de_round"]
         return Tour(tour_name, begin_time, end_time, round_instances_list)
-
-
-    # def add_tour_name(self):
-    #     """Creation of method for Tour Class""" inutile
-    #     # methode pour definir le nom du tour qui sera par defaut Round 1, Round 2 ...
-    #     informed_tour_name = False
-    #     while not informed_tour_name:
-    #         tour_name = input("Veuillez entrer le nom du tour (Round 1, Round 2, etc) : ")
-    #         if tour_name == "Round 1":
-    #             informed_tour_name = True
-    #         elif tour_name == "Round 2":
-    #             informed_tour_name = True
-    #         elif tour_name == "Round 3":
-    #             informed_tour_name = True
-    #         elif tour_name == "Round 4":
-    #             informed_tour_name = True
-    #         else:
-    #             print("Vous avez mal renseigné le nom du tour, veuillez re-essayer")
-    #         print(f"le nom du tour est :" + tour_name)
-    #     return informed_tour_name
 
     def add_begin_time(self):
         # methode pour ajouter date et heure de debut du round
@@ -75,35 +58,30 @@ class Tour:
 
     def add_round_instances_list(self):
         # les intances de rounds seront stockées dans une liste sur l'instance du tournoi
-
+        return
 
     def sorted_players_by_ranking(self, player):
         # Retourne un dictionnaire d’instance d’objet player initialement renseigner par l’organisateur.
         database = TinyDB('db.json', indent=4)
         players_table = database.table('players')
         players_initial_dict = players_table.all()
-        print(players_initial_dict)
-
+        #print(players_initial_dict)
         # sorted of dictionnary, in result we have a list of complex key/value pairs
         sorted_ranking_of_players_initial_list = sorted(players_initial_list, key=lambda t: t["Classement"],
-                                                        reverse=True)
+                                                reverse=True)
         print(sorted_ranking_of_players_initial_list)
-
         # slicing in 2 lists, upper & lower ranking
         upper_players_list = sorted_ranking_of_players_initial_list[0:4]
         lower_players_list = sorted_ranking_of_players_initial_list[4:8]
         print(upper_players_list)
         print(lower_players_list)
-        return
-
-
 
 
 class Match:
     # chaque match est definit par un tuple composé de deux listes contenant id du joueur et son score
     def __init__(self, match_name=None, player_1=None, player_2=None,
              score_player_1=0, score_player_2=0):
-        self.match_name = "Match" + str(Match.MATCH_NUMBER)
+        #self.match_name = "Match" + str(Match.MATCH_NUMBER)
         self.player_1 = player_1
         self.player_2 = player_2
         self.score_player_1 = score_player_1
@@ -141,8 +119,25 @@ class Match:
         players_table = database.table('players')
         print(players_table.all())
 
+    def listing_of_players(self):
+        database = TinyDB('db.json', indent=4)
+        players_table = database.table('players')
+        players_initial_list = players_table.all()
+        print(players_initial_list)
+        print(type(players_initial_list))
 
-    def add_match_score_first_round(self):
+        # sorted of dictionnary, in result we have a list of complex key/value pairs
+        sorted_ranking_of_players_initial_list = sorted(players_initial_list, key=lambda t: t["Classement"],
+                                                        reverse=True)
+        print(sorted_ranking_of_players_initial_list)
+
+        # slicing in 2 lists, upper & lower ranking
+        upper_players_list = sorted_ranking_of_players_initial_list[0:4]
+        lower_players_list = sorted_ranking_of_players_initial_list[4:8]
+        return upper_players_list, lower_players_list
+
+
+    def add_match_score_first_round(self, upper_players_list, lower_players_list):
         """Pour recolter le score des matchs du premier round"""
 
         first_round_matches_list = []
@@ -173,6 +168,9 @@ class Match:
                     first_round_match[0][1] += 1
                     print(f" l'id du joueur {first_round_match[0][0]} a {first_round_match[0][1]} point \n"
                           f"l'id du joueur {first_round_match[1][0]} a {first_round_match[1][1]} point \n")
+                    first_round_match_dict = dict(first_round_match)
+                    first_round_matches_dict.update(first_round_match_dict)
+                    print(first_round_matches_dict)
 
                 elif match_winner == str(2):
                     informed_match_winner = True
@@ -181,6 +179,9 @@ class Match:
                     first_round_match[1][1] += 1
                     print(f" l'id du joueur {first_round_match[0][0]} a {first_round_match[0][1]} point \n"
                           f"l'id du joueur {first_round_match[1][0]} a {first_round_match[1][1]} point \n")
+                    first_round_match_dict = dict(first_round_match)
+                    first_round_matches_dict.update(first_round_match_dict)
+                    print(first_round_matches_dict)
 
                 elif match_winner == str(3):
                     informed_match_winner = True
@@ -191,31 +192,54 @@ class Match:
                     first_round_match[1][1] += 0.5
                     print(f" l'id du joueur {first_round_match[0][0]} a {first_round_match[0][1]} point \n"
                           f"l'id du joueur {first_round_match[1][0]} a {first_round_match[1][1]} point \n")
+                    first_round_match_dict = dict(first_round_match)
+                    first_round_matches_dict.update(first_round_match_dict)
+                    print(first_round_matches_dict)
 
                 else:
                     print(f"il y a une erreur dans votre saisie, veuillez recommencer")
             first_round_matches_list.append(first_round_match)
-            print(first_round_matches_list)
-            match_dict = dict(first_round_match)
-        print(match_dict)
-        first_round_matches_dict.update(match_dict)
+            print(f"la liste des matchs du premier tour est {first_round_matches_list}")
+            print(f"le dictionnaire joueur/ score est {first_round_matches_dict}")
+        #print(match_dict)
+        #first_round_matches_dict.update(match_dict)
+        print(first_round_matches_dict)
+        return first_round_matches_dict, first_round_matches_list
 
-    def sorted_players_after_first_round(self,first_round_matches_dict):
+    def first_round_list_sliced_by_match(self, first_round_matches_list):
+        liste_de_match = []
+        for match in first_round_matches_list:
+            dict_match = {"id_du_joueur_1": match[0][0], "score_1": match[0][1], "id_du_joueur_2": match[1][0], "score_2": match[1][1]}
+            liste_de_match.append(dict_match)
+        return liste_de_match
+
+
+
+    def sorted_players_after_first_round(self, first_round_matches_dict):
         # sorted of dictionnary, in result we have a list of complex key/value pairs
         sorted_players_after_first_round_list = sorted(first_round_matches_dict.items(), key=operator.itemgetter(1),
                                                         reverse=True)
-        print(sorted_players_after_first_round_list)
+        print(f"Le classement du premier tour est {sorted_players_after_first_round_list}")
+        return sorted_players_after_first_round_list
+
+    def sorted_players_by_id_after_first_round(self, first_round_matches_dict):
+        sorted_players_by_id_after_first_round_list = sorted(first_round_matches_dict, key=lambda t: t[0],
+                                                        reverse=False)
+        print(f"le tri ici est fait par id_du_joueur pour MAJ du score {sorted_players_by_id_after_first_round_list}")
+        return sorted_players_by_id_after_first_round_list
+
 
     def save_db_match_first_round(self):
+        return
 
-    def add_match_score_second_round(self):
+    def add_match_score_second_round(self, sorted_players_after_first_round_list):
         """Pour recolter le score des matchs du second round"""
 
         second_round_matches_list = []
         second_round_matches_dict = {}
         for i in range(0, 3):
-            # print(i,v)
-            # print(lower_players_list[i])
+            print(i)
+            print(sorted_players_after_first_round_list[i])
             joueur_1 = sorted_players_after_first_round_list[i]
             joueur_2 = sorted_players_after_first_round_list[i + 1]
             second_round_match = ([joueur_1['id_du_joueur'], joueur_1['Score']],
@@ -272,114 +296,5 @@ class Match:
 
 
 
-    #     first_round_matches_list = []
-    #
-    #     """Pour le premier match"""
-    #     match_1_vs_5 = ([upper_player_list[0][4], upper_player_list[0][5]],
-    #                     [lower_player_list[0][4], lower_player_list[0][5]])
-    #     informed_match_1_vs_5  = False
-    #     while not informed_match_1_vs_5:
-    #         score_player_1 = input(f"veuillez enter le score du joueur 1 : ")
-    #         score_player_2 = input(f"veuillez enter le score du joueur 2 : ")
-    #         if (score_player_1 == 0) and (score_player_2 == 1):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches_list.append(match_1_vs_5)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches_list.append(match_1_vs_5)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches_list.append(match_1_vs_5)
-    #         else:
-    #             print(f'il y a une erreur dans le résultat, veuillez recommencer')
-    #     return
-    #
-    #     """Pour le second match"""
-    #     match_2_vs_6 = ([upper_player_list[1][4], score_player_1],
-    #                    [lower_player_list[1][4], score_player_2])
-    #     informed_match_2_vs_6 = False
-    #     while not informed_match_2_vs_6:
-    #         score_player_1 = input(f"veuillez enter le score du joueur 1 : ")
-    #         score_player_2 = input(f"veuillez enter le score du joueur 2 : ")
-    #         if (score_player_1 == 0) and (score_player_2 == 1):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches.append(match_2_vs_6)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches.append(match_2_vs_6)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches.append(match_2_vs_6)
-    #         else:
-    #             print(f'il y a une erreur dans le résultat, veuillez recommencer')
-    #     return
-    #
-    #     """Pour le troisième match"""
-    #     match_3_vs_7 = ([upper_player_list[2][4], score_player_1],
-    #                    [lower_player_list[2][4], score_player_2])
-    #     informed_match_3_vs_7 = False
-    #     while not informed_match_3_vs_7:
-    #         score_player_1 = input(f"veuillez enter le score du joueur 1 : ")
-    #         score_player_2 = input(f"veuillez enter le score du joueur 2 : ")
-    #         if (score_player_1 == 0) and (score_player_2 == 1):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches.append(match_3_vs_7)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches.append(match_3_vs_7)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches.append(match_3_vs_7)
-    #         else:
-    #             print(f'il y a une erreur dans le résultat, veuillez recommencer')
-    #     return
-    #
-    #     """Pour le quatrième match"""
-    #     match_4_vs_8 = ([upper_player_list[3][4], score_player_1],
-    #                    [lower_player_list[3][4], score_player_2])
-    #     informed_match_4_vs_8 = False
-    #     while not informed_match_4_vs_8:
-    #         score_player_1 = input(f"veuillez enter le score du joueur 1 : ")
-    #         score_player_2 = input(f"veuillez enter le score du joueur 2 : ")
-    #         if (score_player_1 == 0) and (score_player_2 == 1):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches_list.append(match_4_vs_8)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches_list.append(match_4_vs_8)
-    #         elif (score_player_1 == 0.5) and (score_player_2 == 0.5):
-    #             print(f"le joueur 1 a  {score_player_1} point et joueur 2 a {score_player_2}")
-    #             informed_match = True
-    #             first_round_matches_list.append(match_4_vs_8)
-    #         else:
-    #             print(f'il y a une erreur dans le résultat, veuillez recommencer')
-    #     return
-    # print("{first_round_matches_list[0]} \n"
-    #       "{first_round_matches_list[1]} \n"
-    #       "{first_round_matches_list[2]} \n"
-    #       "{first_round_matches_list[3]} \n"
-    #       )
-    #
-    # def first_round_players_ranking():
-    #     score_by_player_first_round_list = ([upper_player_list[0][4], score_player_1],
-    #                                         [lower_player_list[0][4], score_player_2]
-    #                                         [upper_player_list[1][4], score_player_1],
-    #                                         [lower_player_list[1][4], score_player_2],
-    #                                         [upper_player_list[2][4], score_player_1],
-    #                                         [lower_player_list[2][4], score_player_2]
-    #                                         [upper_player_list[3][4], score_player_1],
-    #                                         [lower_player_list[3][4], score_player_2]
-    #                                         )
 
 
