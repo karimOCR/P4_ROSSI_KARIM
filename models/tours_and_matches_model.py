@@ -1,6 +1,6 @@
 from tinydb import TinyDB
 from operator import itemgetter
-from operator import attrgetter
+import operator
 
 """definition des classes Tour et Match et de leurs methodes"""
 
@@ -223,10 +223,19 @@ class Match:
         return sorted_players_after_first_round_list
 
     def sorted_players_by_id_after_first_round(self, first_round_matches_dict):
+        #trier les resultats du premier tour par Id avec comme sortie une liste de tuples
         sorted_players_by_id_after_first_round_list = sorted(first_round_matches_dict, key=lambda t: t[0],
                                                         reverse=False)
         print(f"le tri ici est fait par id_du_joueur pour MAJ du score {sorted_players_by_id_after_first_round_list}")
         return sorted_players_by_id_after_first_round_list
+
+    def dict_sorted_players_by_id_after_first_round(self, sorted_players_by_id_after_first_round_list):
+        #convertir une liste de tuple en dictionnaire
+        dict_sorted_by_id_to_insert_score = {}
+        for player in sorted_players_by_id_after_first_round_list:
+            dict_sorted_by_id_to_insert_score[player[0]] = player[1]
+        print(dict_sorted_by_id_to_insert_score)
+        return dict_sorted_by_id_to_insert_score
 
 
     def save_db_match_first_round(self):
@@ -239,7 +248,7 @@ class Match:
         second_round_matches_dict = {}
         for i in range(0, 3):
             print(i)
-            print(sorted_players_after_first_round_list[i])
+            print(f"le classement des participants au premier tour{sorted_players_after_first_round_list[i]}")
             joueur_1 = sorted_players_after_first_round_list[i]
             joueur_2 = sorted_players_after_first_round_list[i + 1]
             second_round_match = ([joueur_1['id_du_joueur'], joueur_1['Score']],
@@ -288,10 +297,11 @@ class Match:
                     print(f"il y a une erreur dans votre saisie, veuillez recommencer")
             second_round_matches_list.append(second_round_match)
             match_dict = dict(second_round_match)
-            print(f"Classement du premier tour avec joueur_id et score associé {match_dict}")
+            print(f"Classement du second tour avec joueur_id et score associé {match_dict}")
             second_round_matches_dict.update(match_dict)
         print(second_round_matches_list)
         print(second_round_matches_dict)
+        return second_round_matches_dict, second_round_matches_list
 
 
 
